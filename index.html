@@ -169,8 +169,9 @@
                 useExtendedSearch: true,
                 ignoreLocation: false,
                 threshold: 0.25,
+                distance: 400,
                 includeMatches: true,
-                includeScore: true,
+                includeScore: false,
                 minMatchCharLength: 3
             });
             generateTableBody(fuse.search(searchValue, { limit: 500 }));
