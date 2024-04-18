@@ -33,9 +33,14 @@
         <tbody id="searchTableBody">
         </tbody>
     </table>
+    <input type="button" value="sound" onclick="playMusic()" />
 </body>
 
 <script type="text/javascript">
+    function playMusic(){
+  var music = new Audio('sound.mp3');
+  music.play();
+  }
     let fileupload = $("#file");
     let data = [];
     let fields = [];
