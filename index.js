@@ -158,7 +158,7 @@ function onFuzzySearch(searchValue) {
             useExtendedSearch: true,
             ignoreLocation: false,
             threshold: 0.25,
-            distance: 400,
+            distance: 200,
             includeMatches: true,
             includeScore: false,
             minMatchCharLength: 3
