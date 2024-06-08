@@ -10,20 +10,26 @@
 
     <title>title</title>
     <style>
-        .fuzzyHighlight {
+        zwj {
             background-color: #ffd5fc;
         }
     </style>
 </head>
 
 <body class="container h-100 p-5 bg-light-subtle">
-    <label for="file" class="form-label">Upload Data:</label>
+    <label for="file" class="form-label bold"><b>Upload Data:</b></label>
     <input id="file" class="form-control" type="file" name="file" accept=".csv" autocomplete="off"></input>
     <br />
+    <label for="fuzzySearch" class="form-label"><b>Fuzzy Search:</b></label>
     <input id="fuzzySearch" class="form-control" type="text" name="fuzzySearch" autocomplete="off"
-        placeholder="Fuzzy Search"
-        title="Contains-> 'jar, Exact-> =love, Combined-> car wheel, Either-> baby|man"></input>
+        placeholder="Contains-> 'jar, Exact-> =love, Combined-> car wheel, Either-> baby|man"></input>
     <br />
+    <div><b>Options:</b></div>
+    <input class="form-check-input m-1" type="checkbox" id="highlightSearch" name="highlightSearch" checked
+        onclick="onHighlightCheckboxChange()"></input>
+    <label class="form-check-label" for="highlightSearch">Highlight</label>
+    <br />
+    <hr>
     <div id="searchableFields">
     </div>
     <br />
@@ -35,156 +41,7 @@
     </table>
 </body>
 
-<script type="text/javascript">
-    let fileupload = $("#file");
-    let data = [];
-    let fields = [];
-    let searchableFields = {};
-    fileupload.on('change', function () {
-        let reader = new FileReader();
-        reader.addEventListener("load", () => handleFile(), false);
-        reader.readAsText(this.files[0]);
-        function handleFile() {
-            let result = reader.result;
-            let splitted = result.split("\r\n");
-            fields = splitted[0].trim().split(",");
-            data = [];
-            for (let i = 1; i < splitted.length; i++) {
-                let row = splitted[i].trim().split(",");
-                if (!row || row.length === 0) {
-                    continue;
-                }
-                let obj = {};
-                for (let j = 0; j < row.length; j++) {
-                    let value = row[j].trim().replace(/\"/g, "");
-                    if (!value) {
-                        continue;
-                    }
-                    obj[fields[j]] = value;
-                }
-                data.push(obj);
-            }
-            //console.table(data);
-            generateTableHeaders();
-        }
-    });
-
-    function generateTableHeaders() {
-        let tableHeader = $("#searchTableHead");
-        tableHeader.empty();
-        let dom = tableHeader[0];
-        let tableHeaderRow = dom.insertRow();
-        for (let z = 0; z < fields.length; z++) {
-            let cell = tableHeaderRow.insertCell(z);
-            cell.innerHTML = fields[z];
-        }
-        generateSearchableFieldsCheckboxes();
-    }
-
-    function generateSearchableFieldsCheckboxes() {
-        searchableFields = {};
-        let em = $("#searchableFields");
-        for (let z = 0; z < fields.length; z++) {
-            let key = fields[z];
-            em.append(`
-            <input class="form-check-input m-1" type="checkbox" id="field_${key}" name="field_${key}" value="${key}" checked onclick="onSearchableFieldsClick(this)">
-            <label class="form-check-label" for="field_${key}">${key}</label>
-            `);
-            searchableFields[key] = true;
-        }
-    }
-
-    function onSearchableFieldsClick(event) {
-        let dom = $(`[id='${event.id}']`)[0];
-        searchableFields[dom.value] = dom.checked;
-    }
-
-    const set = (obj, path, value) => {
-        const pathValue = path.split('.');
-        let i;
-
-        for (i = 0; i < pathValue.length - 1; i++) {
-            obj = obj[pathValue[i]];
-        }
-
-        obj[pathValue[i]] = value;
-    };
-
-    const generateHighlightedText = (inputText, regions) => {
-        let content = '';
-        let nextUnhighlightedRegionStartingIndex = 0;
-        regions.forEach(region => {
-            const lastRegionNextIndex = region[1] + 1;
-
-            content += [
-                inputText.substring(nextUnhighlightedRegionStartingIndex, region[0]),
-                `<span class="fuzzyHighlight">`,
-                inputText.substring(region[0], lastRegionNextIndex),
-                '</span>',
-            ].join('');
-
-            nextUnhighlightedRegionStartingIndex = lastRegionNextIndex;
-        });
-
-        content += inputText.substring(nextUnhighlightedRegionStartingIndex);
-
-        return content;
-    };
-
-    function generateTableBody(searchedData) {
-        //console.log(searchedData)
-        let tableBody = $("#searchTableBody");
-        tableBody.empty();
-        let dom = tableBody[0];
-        for (let i = 0; i < searchedData.length; i++) {
-            let data = searchedData[i];
-            let item = { ...data.item };
-            let row = dom.insertRow();
-            for (let z = 0; z < fields.length; z++) {
-                let key = fields[z];
-                //data.matches.forEach(e => set(item, e.key, generateHighlightedText(e.value, e.indices)));
-                let cell = row.insertCell(z);
-                cell.innerHTML = item[key];
-            }
-        }
-    }
-
-    let fuzzySearch = $("#fuzzySearch");
-    fuzzySearch.on("input", onFuzzySearch);
-    let fuzzySearchTimeout;
-    function onFuzzySearch(event) {
-        if (fuzzySearchTimeout) {
-            clearTimeout(fuzzySearchTimeout);
-        }
-        fuzzySearchTimeout = setTimeout(() => {
-            let searchValue = event.currentTarget.value;
-            let keys = [];
-            Object.keys(searchableFields).forEach(e => {
-                if (searchableFields[e]) {
-                    keys.push(e);
-                }
-            });
-            const fuse = new Fuse(data, {
-                keys: keys,
-                useExtendedSearch: true,
-                ignoreLocation: false,
-                threshold: 0.25,
-                distance: 200,
-                includeMatches: true,
-                includeScore: false,
-                minMatchCharLength: 3
-            });
-            generateTableBody(fuse.search(searchValue, { limit: 500 }));
-        }, 500);
-
-    }
-
-
-
-
-
-
-</script>
+<script type="text/javascript" src="./index.js"></script>
 <script src="./bootstrap.bundle.min.js"></script>
 
 </html>
