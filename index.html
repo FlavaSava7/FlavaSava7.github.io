@@ -142,7 +142,7 @@
             let row = dom.insertRow();
             for (let z = 0; z < fields.length; z++) {
                 let key = fields[z];
-                data.matches.forEach(e => set(item, e.key, generateHighlightedText(e.value, e.indices)));
+                //data.matches.forEach(e => set(item, e.key, generateHighlightedText(e.value, e.indices)));
                 let cell = row.insertCell(z);
                 cell.innerHTML = item[key];
             }
