@@ -17,14 +17,14 @@
 </head>
 
 <body class="container h-100 p-5 bg-light-subtle">
-    <label for="file" class="form-label bold"><b>Upload Data:</b></label>
+    <label for="file" class="form-label fw-bold">Upload Data:</label>
     <input id="file" class="form-control" type="file" name="file" accept=".csv" autocomplete="off"></input>
     <br />
-    <label for="fuzzySearch" class="form-label"><b>Fuzzy Search:</b></label>
+    <label for="fuzzySearch" class="form-label fw-bold">Fuzzy Search:</label>
     <input id="fuzzySearch" class="form-control" type="text" name="fuzzySearch" autocomplete="off"
         placeholder="Contains-> 'jar, Exact-> =love, Combined-> car wheel, Either-> baby|man"></input>
     <br />
-    <div><b>Options:</b></div>
+    <div class="fw-bold">Options:</div>
     <input class="form-check-input m-1" type="checkbox" id="highlightSearch" name="highlightSearch" checked
         onclick="onHighlightCheckboxChange()"></input>
     <label class="form-check-label" for="highlightSearch">Highlight</label>
@@ -39,6 +39,11 @@
         <tbody id="searchTableBody">
         </tbody>
     </table>
+    <div id="toast" class="toast mt-3 position-absolute top-0 end-0 bg-secondary text-white fw-bold">
+        <div class="toast-body">
+            Copied!
+        </div>
+    </div>
 </body>
 
 <script type="text/javascript" src="./index.js"></script>

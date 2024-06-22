@@ -2,6 +2,9 @@ let fileupload = $("#file");
 let data = [];
 let fields = [];
 let searchableFields = {};
+let searchedData = [];
+let searchTableBody = $("#searchTableBody");
+
 fileupload.on('change', function () {
     let reader = new FileReader();
     reader.addEventListener("load", () => handleFile(), false);
@@ -119,11 +122,9 @@ function highlightMatches(field, text, matches) {
     return highlightedText;
 }
 
-function generateTableBody(searchedData) {
-    //console.log(searchedData)
-    let tableBody = $("#searchTableBody");
-    tableBody.empty();
-    let dom = tableBody[0];
+function generateTableBody() {
+    searchTableBody.empty();
+    let dom = searchTableBody[0];
     for (let i = 0; i < searchedData.length; i++) {
         let data = { ...searchedData[i] };
         // if (data.item["id_product_fulltype"] !== "8547") {
@@ -163,7 +164,35 @@ function onFuzzySearch(searchValue) {
             includeScore: false,
             minMatchCharLength: 3
         });
-        generateTableBody(fuse.search(searchValue, { limit: 500 }));
+        searchedData = fuse.search(searchValue, { limit: 500 });
+        generateTableBody();
     }, 500);
 
 }
+
+(function () {
+    //td cells click listener
+    searchTableBody.on("click", function (e) {
+        const cell = e.target.closest("td");
+        if (!cell) {
+            return;
+        }
+
+        const row = cell.parentElement;
+        if (!row) {
+            return;
+        }
+
+        const data = searchedData[row.rowIndex - 1];
+        if (!data) {
+            return;
+        }
+
+        const value = data.item[fields[cell.cellIndex]];
+        navigator.clipboard.writeText(value);
+
+        $('#toast').toast({ delay: 1000 });
+        $('#toast').toast('show');
+    });
+})();
+
